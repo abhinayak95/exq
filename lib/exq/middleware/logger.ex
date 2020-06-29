@@ -6,7 +6,7 @@ defmodule Exq.Middleware.Logger do
   require Logger
 
   def before_work(pipeline) do
-    Logger.info("#{log_context(pipeline)} start")
+    # Logger.info("#{log_context(pipeline)} start")
     assign(pipeline, :started_at, DateTime.utc_now())
   end
 

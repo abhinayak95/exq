@@ -11,7 +11,14 @@ defmodule Exq.Middleware.Logger do
   end
 
   def after_processed_work(pipeline) do
-    Logger.info("#{log_context(pipeline)} done: #{formatted_diff(delta(pipeline))}")
+    delta = delta(pipeline)
+
+    if delta > 5_000_00 do
+      %{assigns: %{job: %{args: args}}} = pipeline
+
+      Logger.info("#{log_context(pipeline)} with args #{args |> Enum.join(",")} done: #{formatted_diff(delta)}")
+    end
+
     pipeline
   end
 

@@ -14,9 +14,10 @@ defmodule Exq.Middleware.Logger do
     delta = delta(pipeline)
 
     if delta > 5_000_00 do
-      %{assigns: %{job: %{args: args}}} = pipeline
+      %{assigns: %{job: %{args: args, enqueued_at: enqueued_at}}} = pipeline
 
-      Logger.info("#{log_context(pipeline)} with args #{args |> Enum.join(",")} done: #{formatted_diff(delta)}")
+
+      Logger.info("#{log_context(pipeline)} args: #{args |> Enum.join(",")} enqueued_ago: #{time_since_enque_in_ms(enqueued_at)}ms done: #{formatted_diff(delta)}")
     end
 
     pipeline
@@ -32,6 +33,10 @@ defmodule Exq.Middleware.Logger do
     now_usecs = DateTime.utc_now() |> DateTime.to_unix(:microsecond)
     started_usecs = assigns.started_at |> DateTime.to_unix(:microsecond)
     now_usecs - started_usecs
+  end
+
+  defp time_since_enque_in_ms(enqueued_at) do
+    (Exq.Support.Time.unix_seconds() - enqueued_at) * 1_000
   end
 
   defp log_context(%Pipeline{assigns: assigns}) do
